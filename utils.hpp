@@ -23,3 +23,15 @@ enum {
     a7, b7, c7, d7, e7, f7, g7, h7,
     a8, b8, c8, d8, e8, f8, g8, h8, no_sq,
 };
+
+// Not A file mask bitboard
+constexpr bboard not_a_file = 18374403900871474942ULL;
+// Not H file mask bitboard
+constexpr bboard not_h_file = 9187201950435737471ULL;
+// Not A, B files mask bitboard
+constexpr bboard not_ab_files = 18229723555195321596ULL;
+// Not H, G files mask bitboard
+constexpr bboard not_gh_files = 4557430888798830399ULL;
+
+uint8_t getrank (square sq);
+uint8_t getfile (square sq);
