@@ -1,6 +1,6 @@
 #include "bit_manip_test.hpp"
 
-bool run_bit_manip_tests() {
+bool run_bit_manip_tests () {
     std::cout << "[?] BIT MANIPULATION TESTS RUNNING\n"; 
     bool fail = false;
 
@@ -87,9 +87,9 @@ bool run_bit_manip_tests() {
     }
 
     if (!fail) {
-        std::cout << "[X] BIT MANIPULATION TESTS PASSED\n";
+        std::cout << "[+] BIT MANIPULATION TESTS PASSED\n";
     } else {
-        std::cerr << "[.] BIT MANIPULATION TESTS FAILED\n";
+        std::cerr << "[X] BIT MANIPULATION TESTS FAILED\n";
     }
 
     return fail;
