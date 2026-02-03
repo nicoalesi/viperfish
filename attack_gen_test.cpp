@@ -4,7 +4,6 @@ bool run_mask_gen_tests () {
     std::cout << "[?] MASK GENERATION TESTS RUNNING\n"; 
     bool fail = false;
 
-    bboard bishop_masks[64] = {0};
     create_bishop_masks(bishop_masks);
     if (bishop_masks[a1] == 0x0040201008040200ULL) {
         std::cout << "[PASS]\n";
@@ -19,7 +18,6 @@ bool run_mask_gen_tests () {
         fail = true;
     }
 
-    bboard rook_masks[64] = {0};
     create_rook_masks(rook_masks);
     if (rook_masks[a1] == 0x000101010101017EULL) {
         std::cout << "[PASS]\n";
@@ -107,6 +105,40 @@ bool run_attack_gen_tests () {
         fail = true;
     }
     if (king_att[a8] == 0x0203000000000000ULL) {
+        std::cout << "[PASS]\n";
+    } else {
+        std::cout << "[FAIL]\n";
+        fail = true;
+    }
+
+    create_bishop_attacks(bishop_att);
+    create_rook_attacks(rook_att);
+
+    if (get_bishop_att(c1, 0ULL) == 0x0000804020110A00ULL) {
+        std::cout << "[PASS]\n";
+    } else {
+        std::cout << "[FAIL]\n";
+        fail = true;
+    }
+    if (get_bishop_att(e4, 0x0000440000004400ULL) == 0x0000442800284400ULL) {
+        std::cout << "[PASS]\n";
+    } else {
+        std::cout << "[FAIL]\n";
+        fail = true;
+    }
+    if (get_rook_att(d4, 0ULL) == 0x08080808F7080808ULL) {
+        std::cout << "[PASS]\n";
+    } else {
+        std::cout << "[FAIL]\n";
+        fail = true;
+    }
+    if (get_rook_att(a1, 0x00000000000000FEULL) == 0x0101010101010102ULL) {
+        std::cout << "[PASS]\n";
+    } else {
+        std::cout << "[FAIL]\n";
+        fail = true;
+    }
+    if (get_queen_att(e5, 0x44004000400ULL) == 10544114677918765585ULL) {
         std::cout << "[PASS]\n";
     } else {
         std::cout << "[FAIL]\n";
