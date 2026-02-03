@@ -79,6 +79,7 @@ void create_rook_masks (bboard (&bb)[64]) {
         int8_t rank = getrank(sq);
         int8_t file = getfile(sq);
 
+        // Edges are excluded
         for (int8_t r = rank - 1; r > 0; r--) {
             bb[sq] |= (1ULL << (r * 8 + file));
         }
@@ -100,7 +101,6 @@ bboard create_bishop_table (square sq, bboard block) {
     int8_t rank = getrank(sq);
     int8_t file = getfile(sq);
 
-    // Edges are excluded
     for (int8_t r = rank - 1, f = file - 1; r >= 0 && f >= 0; r--, f--) {
         att |= (1ULL << (r * 8 + f));
         if ((1ULL << (r * 8 + f)) & block) break;
