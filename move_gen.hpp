@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils.hpp"
+#include "move_gen_helper.hpp"
 
 // Binary move's representation:
 
@@ -52,4 +52,53 @@ __always_inline flag get_mv_enpsnt (move mv) {
 
 __always_inline flag get_mv_cstlng (move mv) {
     return (mv & castling_flag_mask) >> 23;
+}
+
+// Generate all legal moves
+__always_inline void generate_moves (Moves &move_list) {
+    move_list.index = 0;
+
+    if (stm == white) {
+        for (piece curr_piece = P; curr_piece <= Q; curr_piece++) {
+            if (curr_piece == P) {
+                generate_moves_white_pawn(move_list);
+            }
+            if (curr_piece == R) {
+                generate_moves_rook(move_list, white);
+            }
+            if (curr_piece == N) {
+                generate_moves_knight(move_list, white);
+            }
+            if (curr_piece == B) {
+                generate_moves_bishop(move_list, white);
+            }
+            if (curr_piece == K) {
+                generate_moves_king(move_list, white);
+            }
+            if (curr_piece == Q) {
+                generate_moves_queen(move_list, white);
+            }
+        }
+    } else {
+        for (piece curr_piece = p; curr_piece <= q; curr_piece++) {
+            if (curr_piece == p) {
+                generate_moves_black_pawn(move_list);
+            }
+            if (curr_piece == r) {
+                generate_moves_rook(move_list, black);
+            }
+            if (curr_piece == n) {
+                generate_moves_knight(move_list, black);
+            }
+            if (curr_piece == b) {
+                generate_moves_bishop(move_list, black);
+            }
+            if (curr_piece == k) {
+                generate_moves_king(move_list, black);
+            }
+            if (curr_piece == q) {
+                generate_moves_queen(move_list, black);
+            }
+        }
+    }
 }

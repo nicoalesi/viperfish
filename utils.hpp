@@ -11,6 +11,7 @@ using piece = uint8_t;
 using move = uint32_t;
 
 enum { white, black, both };
+enum { wk = 1, wq = 2, bk = 4, bq = 8 };
 enum {
     P, R, N, B, K, Q,
     p, r, n, b, k, q,
