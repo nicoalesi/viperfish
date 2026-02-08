@@ -58,7 +58,21 @@ __always_inline flag get_mv_cstlng (move mv) {
 __always_inline void generate_moves (Moves &move_list) {
     move_list.index = 0;
 
+    find_checkers(!stm);
     if (stm == white) {
+        if (countbits(checkers) > 1) {
+            generate_moves_king(move_list, white);
+            return;
+        }
+
+        if (countbits(checkers) == 1) {
+            square king_sq = getls1b(bitboards[K]);
+            square checker_sq = getls1b(checkers);
+            legal_mv_mask = blocker_tables[king_sq][checker_sq] | checkers;
+        } else {
+            legal_mv_mask = 0xFFFFFFFFFFFFFFFFULL;
+        }
+
         for (piece curr_piece = P; curr_piece <= Q; curr_piece++) {
             if (curr_piece == P) {
                 generate_moves_white_pawn(move_list);
@@ -80,6 +94,19 @@ __always_inline void generate_moves (Moves &move_list) {
             }
         }
     } else {
+        if (countbits(checkers) > 1) {
+            generate_moves_king(move_list, black);
+            return;
+        }
+
+        if (countbits(checkers) == 1) {
+            square king_sq = getls1b(bitboards[k]);
+            square checker_sq = getls1b(checkers);
+            legal_mv_mask = blocker_tables[king_sq][checker_sq] | checkers;
+        } else {
+            legal_mv_mask = 0xFFFFFFFFFFFFFFFFULL;
+        }
+
         for (piece curr_piece = p; curr_piece <= q; curr_piece++) {
             if (curr_piece == p) {
                 generate_moves_black_pawn(move_list);

@@ -10,6 +10,36 @@ typedef struct {
     counter index;
 } Moves;
 
+extern bboard blocker_tables[64][64];
+extern bboard legal_mv_mask;
+
+void create_blocker_tables (bboard (&bb)[64][64]);
+
+// Generate a bitboard of pieces that are checking the king of the current given side
+__always_inline void find_checkers (state side) {
+    checkers = 0ULL;
+    square sq = bitboards[(side == white) ? K : k];
+
+    // White pawns (attackers)
+    if (side == white) {
+        checkers |= (pawn_att[black][sq] & bitboards[P]);
+    }
+
+    // Black pawns (attackers)
+    if (side == black) {
+        checkers |= (pawn_att[white][sq] & bitboards[p]);
+    }
+
+    checkers |= get_rook_att(sq, occupancies[both]) & ((side == white) ? bitboards[R] : bitboards[r]);
+
+    checkers |= knight_att[sq] & ((side == white) ? bitboards[N] : bitboards[n]);
+
+    checkers |= get_bishop_att(sq, occupancies[both]) & ((side == white) ? bitboards[B] : bitboards[b]);
+
+    checkers |= get_queen_att(sq, occupancies[both]) & ((side == white) ? bitboards[Q] : bitboards[q]);
+}
+
+// Check if the current given square is attacked by the current given side
 __always_inline bool is_sq_attacked (state side, square sq) {
     // Attacked by white pawns
     if ((side == white) && (pawn_att[black][sq] & bitboards[P])) {
@@ -322,7 +352,7 @@ __always_inline void generate_white_castling (Moves &move_list) {
         // Make sure squares between king and rook are empty
         if(!getbit(occupancies[both], f1) && !getbit(occupancies[both], g1)) {
             // Make sure king's and F1 squares are not under attack
-            if(!is_sq_attacked(e1, black) && !is_sq_attacked(f1, black)) {
+            if(!is_sq_attacked(black, e1) && !is_sq_attacked(black, f1)) {
                 add_move(move_list, encode_move(e1, g1, K, 0, 0, 0, 0, 1));
             }
         }
@@ -333,7 +363,7 @@ __always_inline void generate_white_castling (Moves &move_list) {
         // Make sure squares between king and rook are empty
         if(!getbit(occupancies[both], d1) && !getbit(occupancies[both], c1) && !getbit(occupancies[both], b1)) {
             // Make sure king's and D1 squares are not under attack
-            if(!is_sq_attacked(e1, black) && !is_sq_attacked(d1, black)) {
+            if(!is_sq_attacked(black, e1) && !is_sq_attacked(black, d1)) {
                 add_move(move_list, encode_move(e1, c1, K, 0, 0, 0, 0, 1));
             }
         }
@@ -346,7 +376,7 @@ __always_inline void generate_black_castling (Moves &move_list) {
         // Make sure squares between king and rook are empty
         if(!getbit(occupancies[both], f8) && !getbit(occupancies[both], g8)) {
             // Make sure king's and F8 squares are not under attack
-            if(!is_sq_attacked(e8, white) && !is_sq_attacked(f8, white)) {
+            if(!is_sq_attacked(white, e8) && !is_sq_attacked(white, f8)) {
                 add_move(move_list, encode_move(e8, g8, k, 0, 0, 0, 0, 1));
             }
         }
@@ -357,7 +387,7 @@ __always_inline void generate_black_castling (Moves &move_list) {
         // Make sure squares between king and rook are empty
         if(!getbit(occupancies[both], d8) && !getbit(occupancies[both], c8) && !getbit(occupancies[both], b8)) {
             // Make sure king's and D8 squares are not under attack
-            if(!is_sq_attacked(e8, white) && !is_sq_attacked(d8, white)) {
+            if(!is_sq_attacked(white, e8) && !is_sq_attacked(white, d8)) {
                 add_move(move_list, encode_move(e8, c8, k, 0, 0, 0, 0, 1));
             }
         }
@@ -388,6 +418,11 @@ __always_inline void generate_moves_king (Moves &move_list, state side) {
         while (attacks) {
             // Init target square
             target_sq = getls1b(attacks);
+
+            if (is_sq_attacked(!side, target_sq)) {
+                popbit(attacks, target_sq);
+                continue;
+            }
 
             if (!getbit(occupancies[!side], target_sq)) {
                 // Quiet move
