@@ -2,12 +2,18 @@
 
 #include "utils.hpp"
 
-bboard bitboards[12];
-bboard occupancies[3];
-flag castling;
+extern bboard bitboards[12];
+extern bboard occupancies[3];
+extern bboard checkers;
+extern bboard pins;
+
+extern flag castling;
+
 // Side to move
-state stm;
+extern state stm;
+
 // En passant square
-square enpassant;
+extern square enpassant;
+
 // Half move clock to enforce 50-move rule
-counter hmclock;
+extern counter hmclock;
