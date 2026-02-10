@@ -18,3 +18,5 @@ extern square enpassant;
 
 // Half move clock to enforce 50-move rule
 extern counter hmclock;
+// Full move clock to count the total number of moves
+extern counter fmclock;
