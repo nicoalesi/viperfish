@@ -72,9 +72,13 @@ bool split_str (const std::string &position, std::string &side_to_move, std::str
     std::string &castling_rights, std::string &en_passant, std::string &hm_clock, std::string &fm_clock) {
     counter cnt = 0;
     std::string fields[6];
-    uint8_t start = 0, end;
+    size_t start = 0, end;
 
     while ((end = position.find(' ', start)) != std::string::npos) {
+        if (cnt >= 5) {
+            std::cerr << "Too many spaces.\n";
+            return false;
+        }
         fields[cnt] = position.substr(start, end - start);
         start = end + 1;
         cnt++;
