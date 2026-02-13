@@ -2,26 +2,6 @@
 
 #include "move_gen_helper.hpp"
 
-// Binary move's representation:
-
-//    0000 0000 0000 0000 00XX XXXX   Source square       (Up to 6b)
-//    0000 0000 0000 XXXX XX00 0000   Target square       (Up to 6b)
-//    0000 0000 XXXX 0000 0000 0000   Piece               (Up to 4b)
-//    0000 XXXX 0000 0000 0000 0000   Promoted piece      (Up to 4b)
-//    000X 0000 0000 0000 0000 0000   Capture flag        (Up to 1b)
-//    00X0 0000 0000 0000 0000 0000   Double push flag    (Up to 1b)
-//    0X00 0000 0000 0000 0000 0000   En passant flag     (Up to 1b)
-//    X000 0000 0000 0000 0000 0000   Castling flag       (Up to 1b)
-
-constexpr uint32_t source_sq_mask = 0x00003F;
-constexpr uint32_t target_sq_mask = 0x000FC0;
-constexpr uint32_t piece_mask = 0x00F000;
-constexpr uint32_t promoted_piece_mask = 0x0F0000;
-constexpr uint32_t capture_flag_mask = 0x100000;
-constexpr uint32_t double_push_flag_mask = 0x200000;
-constexpr uint32_t en_passant_flag_mask = 0x300000;
-constexpr uint32_t castling_flag_mask = 0x400000;
-
 constexpr uint8_t update_castling_rights[64] = {
     13, 15, 15, 15, 12, 15, 15, 14,
     15, 15, 15, 15, 15, 15, 15, 15,
@@ -33,43 +13,12 @@ constexpr uint8_t update_castling_rights[64] = {
      7, 15, 15, 15,  3, 15, 15, 11,
 };
 
-__always_inline square get_mv_src (move mv) {
-    return mv & source_sq_mask;
-}
-
-__always_inline square get_mv_trgt (move mv) {
-    return (mv & target_sq_mask) >> 6;
-}
-
-__always_inline piece get_mv_piece (move mv) {
-    return (mv & piece_mask) >> 12;
-}
-
-__always_inline piece get_mv_prmtd (move mv) {
-    return (mv & promoted_piece_mask) >> 16;
-}
-
-__always_inline flag get_mv_cptr (move mv) {
-    return (mv & capture_flag_mask) >> 20;
-}
-
-__always_inline flag get_mv_dblpsh (move mv) {
-    return (mv & double_push_flag_mask) >> 21;
-}
-
-__always_inline flag get_mv_enpsnt (move mv) {
-    return (mv & en_passant_flag_mask) >> 22;
-}
-
-__always_inline flag get_mv_cstlng (move mv) {
-    return (mv & castling_flag_mask) >> 23;
-}
-
 // Generate all legal moves
 __always_inline void generate_moves (Moves &move_list) {
     move_list.index = 0;
 
     find_checkers(!stm);
+
     if (stm == white) {
         if (countbits(checkers) > 1) {
             generate_moves_king(move_list, white);
@@ -148,7 +97,7 @@ __always_inline void generate_moves (Moves &move_list) {
 }
 
 // Make one move
-__always_inline int make_move(int move) {
+__always_inline int make_move (int move) {
     square source = get_mv_src(move);
     square target = get_mv_trgt(move);
     piece curr_piece = get_mv_piece(move);
@@ -156,7 +105,7 @@ __always_inline int make_move(int move) {
     flag capture = get_mv_cptr(move);
     flag double_move = get_mv_dblpsh(move);
     square en_passant_move = get_mv_enpsnt(move);
-    flag castling = get_mv_cstlng(move);
+    flag castling_flag = get_mv_cstlng(move);
 
     // Refs to occupancies bboards
     bboard *own_occ = &occupancies[stm];
@@ -222,10 +171,10 @@ __always_inline int make_move(int move) {
 
     // Reset en passant and set if double pawn push
     enpassant = no_sq;
-    if (double_move) enpassant = (stm == white) ? target + 8 : target - 8;
+    if (double_move) enpassant = (stm == white) ? target - 8 : target + 8;
 
     // Handle castling (update rook bitboard and own occupancy)
-    if (castling) {
+    if (castling_flag) {
         switch (target) {
             case g1:
                 popbit(bitboards[R], h1);
@@ -262,6 +211,11 @@ __always_inline int make_move(int move) {
 
     // Update combined occupancy
     occupancies[both] = occupancies[white] | occupancies[black];
+
+    // Update move clocks
+    hmclock++;
+    // Equivalent to: if (stm == black) fmclock++;
+    fmclock += black;
 
     // Switch side
     stm ^= 1;
