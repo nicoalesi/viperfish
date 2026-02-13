@@ -12,13 +12,13 @@ bboard rook_att[64][4096];
 
 void create_pawn_attacks (bboard (&bb)[2][64]) {
     // White pawn attacks
-    for (square sq = a2; sq <= h7; sq++) {
+    for (square sq = a1; sq <= h8; sq++) {
         bb[white][sq] |= ((1ULL << sq << 7) & not_h_file);
         bb[white][sq] |= ((1ULL << sq << 9) & not_a_file);
     }
 
     // Black pawn attacks
-    for (square sq = a2; sq <= h7; sq++) {
+    for (square sq = a1; sq <= h8; sq++) {
         bb[black][sq] |= ((1ULL << sq >> 7) & not_a_file);
         bb[black][sq] |= ((1ULL << sq >> 9) & not_h_file);
     }

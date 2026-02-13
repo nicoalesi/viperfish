@@ -5,6 +5,8 @@
 #include "board_rep.hpp"
 #include "utils.hpp"
 
+#include "debug.hpp"
+
 typedef struct {
     move moves[256];
     counter index;
@@ -341,7 +343,7 @@ __always_inline void generate_moves_black_pawn(Moves &move_list) {
         }
 
         // Generate en passant capture
-        if (enpassant != no_sq && getbit(legal_mv_mask, enpassant) && (!pinned || getbit(pin_mask[source_square], target_square))) {
+        if (enpassant != no_sq && getbit(legal_mv_mask, enpassant) && (!pinned || getbit(pin_mask[source_square], enpassant))) {
             // Create en passant attack bitboard
             bboard en_passant_attacks = pawn_att[black][source_square] & (1ULL << enpassant);
 

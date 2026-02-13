@@ -21,7 +21,7 @@ void run_perft (int depth) {
 
         make_move(mv);
 
-        int old_nodes = nodes;
+        unsigned long long old_nodes = nodes;
         perft_driver(depth - 1, nodes);
         std::cout << hr_squares[get_mv_src(mv)] << hr_squares[get_mv_trgt(mv)] << ": " << nodes - old_nodes << " nodes\n";
 
