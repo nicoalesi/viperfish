@@ -14,11 +14,13 @@ int main (void) {
     if (run_fen_tests()) exit(EXIT_FAILURE);
     parse_fen(starting_pos);
     // make_move(encode_move(e2, e4, P, 0, 0, 1, 0, 0));
-    // make_move(encode_move(a7, a6, p, 0, 0, 0, 0, 0));
-    // make_move(encode_move(e4, e5, P, 0, 0, 0, 0, 0));
-    // make_move(encode_move(d7, d5, p, 0, 1, 0, 1, 0));
+    // make_move(encode_move(c7, c6, p, 0, 0, 0, 0, 0));
+    // make_move(encode_move(g1, f3, N, 0, 0, 0, 0, 0));
+    // make_move(encode_move(d8, c7, q, 0, 0, 0, 0, 0));
+    // make_move(encode_move(f1, e2, B, 0, 0, 0, 0, 0));
+    // make_move(encode_move(c7, h2, q, 0, 1, 0, 0, 0));
     print_board();
-    run_perft(6);
+    run_perft(7);
     std::cout << "captures: " << capturess << "\n";
     std::cout << "checks: " << checkss << "\n";
 }

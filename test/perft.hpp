@@ -9,7 +9,7 @@ void run_perft(int depth);
 extern int capturess;
 extern int checkss;
 
-inline void perft_driver(int depth, int &nodes) {
+inline void perft_driver(int depth, unsigned long long &nodes) {
     if (depth == 0) {
         nodes++;
         checkss += is_sq_attacked(!stm, getls1b(bitboards[(stm == white) ? K : k]));

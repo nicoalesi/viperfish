@@ -463,7 +463,7 @@ __always_inline void generate_white_castling (Moves &move_list) {
         // Make sure squares between king and rook are empty
         if(!getbit(occupancies[both], f1) && !getbit(occupancies[both], g1)) {
             // Make sure king's and F1 squares are not under attack
-            if(!is_sq_attacked(black, e1) && !is_sq_attacked(black, f1)) {
+            if(!is_sq_attacked(black, e1) && !is_sq_attacked(black, f1) && !is_sq_attacked(black, g1)) {
                 add_move(move_list, encode_move(e1, g1, K, 0, 0, 0, 0, 1));
             }
         }
@@ -474,7 +474,7 @@ __always_inline void generate_white_castling (Moves &move_list) {
         // Make sure squares between king and rook are empty
         if(!getbit(occupancies[both], d1) && !getbit(occupancies[both], c1) && !getbit(occupancies[both], b1)) {
             // Make sure king's and D1 squares are not under attack
-            if(!is_sq_attacked(black, e1) && !is_sq_attacked(black, d1)) {
+            if(!is_sq_attacked(black, e1) && !is_sq_attacked(black, d1) && !is_sq_attacked(black, c1)) {
                 add_move(move_list, encode_move(e1, c1, K, 0, 0, 0, 0, 1));
             }
         }
@@ -487,7 +487,7 @@ __always_inline void generate_black_castling (Moves &move_list) {
         // Make sure squares between king and rook are empty
         if(!getbit(occupancies[both], f8) && !getbit(occupancies[both], g8)) {
             // Make sure king's and F8 squares are not under attack
-            if(!is_sq_attacked(white, e8) && !is_sq_attacked(white, f8)) {
+            if(!is_sq_attacked(white, e8) && !is_sq_attacked(white, f8) && !is_sq_attacked(white, g8)) {
                 add_move(move_list, encode_move(e8, g8, k, 0, 0, 0, 0, 1));
             }
         }
@@ -498,7 +498,7 @@ __always_inline void generate_black_castling (Moves &move_list) {
         // Make sure squares between king and rook are empty
         if(!getbit(occupancies[both], d8) && !getbit(occupancies[both], c8) && !getbit(occupancies[both], b8)) {
             // Make sure king's and D8 squares are not under attack
-            if(!is_sq_attacked(white, e8) && !is_sq_attacked(white, d8)) {
+            if(!is_sq_attacked(white, e8) && !is_sq_attacked(white, d8) && !is_sq_attacked(white, c8)) {
                 add_move(move_list, encode_move(e8, c8, k, 0, 0, 0, 0, 1));
             }
         }

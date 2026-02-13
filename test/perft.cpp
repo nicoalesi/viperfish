@@ -6,7 +6,7 @@ int checkss = 0;
 void run_perft (int depth) {
     std::cout << "PERFORMANCE TEST\n";
     Moves move_list;
-    int nodes = 0;
+    unsigned long long nodes = 0;
 
     generate_moves(move_list);
 
