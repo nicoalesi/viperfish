@@ -29,6 +29,7 @@ __always_inline void generate_moves (Moves &move_list) {
             square king_sq = getls1b(bitboards[K]);
             square checker_sq = getls1b(checkers);
             legal_mv_mask = blocker_tables[king_sq][checker_sq] | checkers;
+            if (enpassant != no_sq && (1ULL << (enpassant - 8)) & checkers) legal_mv_mask |= (1ULL << enpassant);
         } else {
             legal_mv_mask = 0xFFFFFFFFFFFFFFFFULL;
         }
@@ -66,6 +67,7 @@ __always_inline void generate_moves (Moves &move_list) {
             square king_sq = getls1b(bitboards[k]);
             square checker_sq = getls1b(checkers);
             legal_mv_mask = blocker_tables[king_sq][checker_sq] | checkers;
+            if (enpassant != no_sq && (1ULL << (enpassant + 8)) & checkers) legal_mv_mask |= (1ULL << enpassant);
         } else {
             legal_mv_mask = 0xFFFFFFFFFFFFFFFFULL;
         }

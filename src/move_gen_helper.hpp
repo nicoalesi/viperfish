@@ -123,7 +123,6 @@ __always_inline void find_pins(state side) {
                 }
             }
         }
-
     }
 }
 
