@@ -2,7 +2,7 @@
 #include "attack_gen_test.hpp"
 #include "move_gen_test.hpp"
 #include "fen_test.hpp"
-#include "perft.hpp"
+#include "perft2.hpp"
 
 #include "debug.hpp"
 
