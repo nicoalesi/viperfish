@@ -45,5 +45,12 @@ int main (void) {
         return EXIT_FAILURE;
     }
 
+    if (run_sq_att_detection_test()) {
+        std::cout << "[+] Square attack detection test passed.\n";
+    } else {
+        std::cout << "[X] Square attack detection test failed.\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }
