@@ -19,3 +19,5 @@ bool run_bishop_move_gen_test ();
 bool run_king_move_gen_test ();
 bool run_queen_move_gen_test ();
 bool run_sq_att_detection_test ();
+bool run_find_checkers_test();
+bool run_pin_detection_test();

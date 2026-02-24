@@ -367,3 +367,201 @@ bool run_sq_att_detection_test () {
 
     return true;
 }
+
+bool run_find_checkers_test() {
+    auto t0 = std::chrono::steady_clock::now();
+
+    std::cout << "Test running: 0.0%";
+    
+    // Black all pieces
+    std::string fen = "rnb1k3/ppp2ppp/B3p3/8/4r3/5n2/PPPp1bPP/RNBQKqNR b KQq - 0 1";
+    parse_fen(fen);
+    find_checkers(black);
+    if (checkers != 270542880ULL) {
+        std::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+
+    std::cout << "\rTest running: 16.7%";
+
+    // White all pieces
+    fen = "rnbQkbnr/pppP1Bpp/3NR3/3p3p/8/8/PPPP1PPP/RNB1K3 b Qkq - 0 1";
+    parse_fen(fen);
+    find_checkers(white);
+    if (checkers != 587746139650916352ULL) {
+        std::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+
+    std::cout << "\rTest running: 33.3%";
+
+    // Black 1 piece
+    fen = "rnb1k2b/ppp2p1p/B3p1p1/8/4r3/1P1B1n2/P1Pp2PP/KR1Q1qNR b q - 0 1";
+    parse_fen(fen);
+    find_checkers(black);
+    if (checkers != 9223372036854775808ULL) {
+        std::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+    
+    std::cout << "\rTest running: 50%";
+
+    // White 1 piece
+    fen = "rnbqk1nr/pppp2pp/4N3/4ppBB/Qb1P1P2/2P3P1/PP2P2P/RN2K2R b KQkq f3 0 1";
+    parse_fen(fen);
+    find_checkers(white);
+    if (checkers != 549755813888ULL) {
+        std::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+
+    std::cout << "\rTest running: 66.7%";
+
+    // Black pinned
+    fen = "rnb1k2b/ppp2p1p/B3p1p1/8/4r3/1PPB1n2/P2pQ1PP/KR3qNR b q - 0 1";
+    parse_fen(fen);
+    find_checkers(black);
+    if (checkers != 0ULL) {
+        std::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+
+    std::cout << "\rTest running: 83.3%";
+    
+    // White pinned
+    fen = "rnbqkrR1/pppp1p1p/2P1Nn2/4p1BB/Qb1P1P2/6P1/PP2P2P/RN2K3 b Qq - 0 1";
+    parse_fen(fen);
+    find_checkers(white);
+    if (checkers != 0ULL) {
+        std::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+
+    auto t1 = std::chrono::steady_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+
+    std::cout << "\rTest running: 100.0%\n";
+    std::cout << "6 cases cleared in " << ms << "ms.\n";
+
+    return true;
+}
+
+bool run_pin_detection_test () {
+    auto t0 = std::chrono::steady_clock::now();
+    
+    std::string fen = "";
+
+    std::cout << "\rTest running: 0.0%";
+
+    // White en passant pin
+    fen = "5k2/8/8/1KpP3r/8/8/8/8 w - c6 0 1";
+    parse_fen(fen);
+    find_pins(white);
+    if (enpassant != no_sq) {
+        std::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+
+    // Black en passant pin
+    fen = "8/8/8/8/1k1pP2R/8/8/6K1 b - e3 0 1";
+    parse_fen(fen);
+    find_pins(black);
+    if (enpassant != no_sq) {
+        std::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+
+    std::cout << "\rTest running: 25.0%";
+
+    // Rooks pins
+    fen = "k7/1n6/b1R5/R7/7r/5r1B/6N1/7K b - - 0 1";
+    parse_fen(fen);
+    
+    find_pins(black);
+    if (pins != 1099511627776ULL || pin_mask[a6] != 282578783305728ULL) {
+        std ::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+
+    find_pins(white);
+    if (pins != 8388608ULL && pin_mask[h3] != 2155905024ULL) {
+        std ::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+
+    std::cout << "\rTest running: 50.0%";
+
+    // Bishop pins
+    fen = "k7/1n6/r1B5/B7/7b/5b1R/6N1/7K b - - 0 1";
+    parse_fen(fen);
+    
+    find_pins(black);
+    if (pins != 562949953421312ULL && pin_mask[b7] != 567347999932416ULL) {
+        std ::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+    
+    find_pins(white);
+    if (pins != 16384ULL && pin_mask[g2] != 2113536ULL) {
+        std ::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+
+    std::cout << "\rTest running: 75.0%";
+    
+    // Diagonal Queen pins
+    fen = "k7/1n6/2Q5/8/8/5q2/6N1/7K w - - 0 1";
+    parse_fen(fen);
+    
+    find_pins(black);
+    if (pins != 562949953421312ULL && pin_mask[b7] != 567347999932416ULL) {
+        std ::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+    
+    find_pins(white);
+    if (pins != 16384ULL && pin_mask[g2] != 2113536ULL) {
+        std ::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+
+    // File Queen pins
+    fen = "k7/1n6/b7/Q7/7q/7B/6N1/7K w - - 0 1";
+    parse_fen(fen);
+    
+    find_pins(black);
+    if (pins != 1099511627776ULL || pin_mask[a6] != 282578783305728ULL) {
+        std ::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }
+
+    find_pins(white);
+    if (pins != 8388608ULL && pin_mask[h3] != 2155905024ULL) {
+        std ::cerr << "\n[FAIL]\n";
+        std::cerr << "Failed test case: " << fen << "\n";
+        return false;
+    }   
+
+    auto t1 = std::chrono::steady_clock::now();
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+
+    std::cout << "\rTest running: 100.0%\n";
+    std::cout << "10 cases cleared in " << ms << "ms.\n";
+
+    return true;
+}

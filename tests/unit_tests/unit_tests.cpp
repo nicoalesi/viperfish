@@ -52,5 +52,19 @@ int main (void) {
         return EXIT_FAILURE;
     }
 
+    if (run_find_checkers_test()) {
+        std::cout << "[+] Checkers detection test passed.\n";
+    } else {
+        std::cout << "[X] Checkers detection test failed.\n";
+        return EXIT_FAILURE;
+    }
+
+    if (run_pin_detection_test()) {
+        std::cout << "[+] Pin detection test passed.\n";
+    } else {
+        std::cout << "[X] Pin detection test failed.\n";
+        return EXIT_FAILURE;
+    }
+
     return EXIT_SUCCESS;
 }
