@@ -9,7 +9,31 @@
 
 typedef struct {
     move moves[256];
-    counter index;
+    // It could theoretically overflow but the maximum
+    // number of moves in one round does not reach 256
+    uint8_t nextindex;
+
+    __always_inline uint8_t size () {
+        return nextindex;
+    }
+
+    __always_inline void add (const move &mv) {
+        moves[nextindex] = mv;
+        nextindex++;
+    }
+
+    __always_inline move operator [] (uint8_t index) {
+        return moves[index];
+    }
+
+    __always_inline move* begin () {
+        return &moves[0];
+    }
+
+    __always_inline move* end () {
+        return &moves[nextindex];
+    }
+
 } Moves;
 
 extern bboard blocker_tables[64][64];
@@ -204,11 +228,6 @@ __always_inline move encode_move (square source, square target, piece curr_piece
     );
 }
 
-__always_inline void add_move (Moves &move_list, move mv) {
-    move_list.moves[move_list.index] = mv;
-    move_list.index++;
-}
-
 __always_inline void generate_moves_white_pawn(Moves &move_list) {
     piece curr_piece = P;
     square source_square;
@@ -229,21 +248,21 @@ __always_inline void generate_moves_white_pawn(Moves &move_list) {
         if ((target_square >= a1) && !getbit(occupancies[both], target_square)) {
             // Pawn promotion
             if (a7 <= source_square && source_square <= h7 && getbit(pawn_mv_mask, target_square) && (!pinned || getbit(pin_mask[source_square], target_square))) {
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, Q, 0, 0, 0, 0));
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, R, 0, 0, 0, 0));
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, B, 0, 0, 0, 0));
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, N, 0, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, Q, 0, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, R, 0, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, B, 0, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, N, 0, 0, 0, 0));
             }
 
             else {
                 // One square pawn move
                 if (getbit(pawn_mv_mask, target_square) && (!pinned || getbit(pin_mask[source_square], target_square))) {
-                    add_move(move_list, encode_move(source_square, target_square, curr_piece, 0, 0, 0, 0, 0));
+                    move_list.add(encode_move(source_square, target_square, curr_piece, 0, 0, 0, 0, 0));
                 }
 
                 // Two square pawn move
                 if ((a2 <= source_square && source_square <= h2) && !getbit(occupancies[both], target_square + 8) && getbit(pawn_mv_mask, target_square + 8) && (!pinned || getbit(pin_mask[source_square], target_square + 8))) {
-                    add_move(move_list, encode_move(source_square, target_square + 8, curr_piece, 0, 0, 1, 0, 0));
+                    move_list.add(encode_move(source_square, target_square + 8, curr_piece, 0, 0, 1, 0, 0));
                 }
             }
         }
@@ -260,15 +279,15 @@ __always_inline void generate_moves_white_pawn(Moves &move_list) {
 
             // Pawn capture promotion
             if (a7 <= source_square && source_square <= h7) {
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, Q, 1, 0, 0, 0));
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, R, 1, 0, 0, 0));
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, B, 1, 0, 0, 0));
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, N, 1, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, Q, 1, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, R, 1, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, B, 1, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, N, 1, 0, 0, 0));
             }
 
             else {
                 // Pawn capture
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, 0, 1, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, 0, 1, 0, 0, 0));
             }   
 
             // Pop least significant bit from attacks bitboard
@@ -285,7 +304,7 @@ __always_inline void generate_moves_white_pawn(Moves &move_list) {
                 // Init en passant target square
                 target_square = getls1b(en_passant_attacks);
 
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, 0, 1, 0, 1, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, 0, 1, 0, 1, 0));
             }
         }
 
@@ -313,21 +332,21 @@ __always_inline void generate_moves_black_pawn(Moves &move_list) {
         if ((target_square <= h8) && !getbit(occupancies[both], target_square)) {
             // Pawn promotion
             if (a2 <= source_square && source_square <= h2 && getbit(pawn_mv_mask, target_square) && (!pinned || getbit(pin_mask[source_square], target_square))) {
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, q, 0, 0, 0, 0));
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, r, 0, 0, 0, 0));
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, b, 0, 0, 0, 0));
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, n, 0, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, q, 0, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, r, 0, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, b, 0, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, n, 0, 0, 0, 0));
             }
 
             else {
                 // One square pawn move
                 if (getbit(pawn_mv_mask, target_square) && (!pinned || getbit(pin_mask[source_square], target_square))) {
-                    add_move(move_list, encode_move(source_square, target_square, curr_piece, 0, 0, 0, 0, 0));
+                    move_list.add(encode_move(source_square, target_square, curr_piece, 0, 0, 0, 0, 0));
                 }
 
                 // Two square pawn move
                 if ((a7 <= source_square && source_square <= h7) && !getbit(occupancies[both], target_square - 8) && getbit(pawn_mv_mask, target_square - 8) && (!pinned || getbit(pin_mask[source_square], target_square - 8))) {
-                    add_move(move_list, encode_move(source_square, target_square - 8, curr_piece, 0, 0, 1, 0, 0));
+                    move_list.add(encode_move(source_square, target_square - 8, curr_piece, 0, 0, 1, 0, 0));
                 }
             }
         }
@@ -344,15 +363,15 @@ __always_inline void generate_moves_black_pawn(Moves &move_list) {
 
             // Pawn capture promotion
             if (a2 <= source_square && source_square <= h2) {
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, q, 1, 0, 0, 0));
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, r, 1, 0, 0, 0));
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, b, 1, 0, 0, 0));
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, n, 1, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, q, 1, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, r, 1, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, b, 1, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, n, 1, 0, 0, 0));
             }
 
             else {
                 // Pawn capture
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, 0, 1, 0, 0, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, 0, 1, 0, 0, 0));
             }
 
             // Pop least significant bit from attacks bitboard
@@ -369,7 +388,7 @@ __always_inline void generate_moves_black_pawn(Moves &move_list) {
                 // Init en passant target square
                 target_square = getls1b(en_passant_attacks);
 
-                add_move(move_list, encode_move(source_square, target_square, curr_piece, 0, 1, 0, 1, 0));
+                move_list.add(encode_move(source_square, target_square, curr_piece, 0, 1, 0, 1, 0));
             }
         }
 
@@ -401,10 +420,10 @@ __always_inline void generate_moves_rook (Moves &move_list, state side) {
 
             if (!getbit(occupancies[!side], target_sq)) {
                 // Quiet move
-                add_move(move_list, encode_move(source_sq, target_sq, curr_piece, 0, 0, 0, 0, 0));
+                move_list.add(encode_move(source_sq, target_sq, curr_piece, 0, 0, 0, 0, 0));
             } else {
                 // Capture move
-                add_move(move_list, encode_move(source_sq, target_sq, curr_piece, 0, 1, 0, 0, 0));
+                move_list.add(encode_move(source_sq, target_sq, curr_piece, 0, 1, 0, 0, 0));
             }
 
             // Pop least significant bit from attacks bitboard
@@ -434,9 +453,9 @@ __always_inline void generate_moves_knight (Moves &move_list, state side) {
             target_sq = getls1b(attacks);
 
             if (!getbit(occupancies[!side], target_sq)) {
-                add_move(move_list, encode_move(source_sq, target_sq, curr_piece, 0, 0, 0, 0, 0));
+                move_list.add(encode_move(source_sq, target_sq, curr_piece, 0, 0, 0, 0, 0));
             } else {
-                add_move(move_list, encode_move(source_sq, target_sq, curr_piece, 0, 1, 0, 0, 0));
+                move_list.add(encode_move(source_sq, target_sq, curr_piece, 0, 1, 0, 0, 0));
             }
 
             popbit(attacks, target_sq);
@@ -464,9 +483,9 @@ __always_inline void generate_moves_bishop (Moves &move_list, state side) {
             target_sq = getls1b(attacks);
 
             if (!getbit(occupancies[!side], target_sq)) {
-                add_move(move_list, encode_move(source_sq, target_sq, curr_piece, 0, 0, 0, 0, 0));
+                move_list.add(encode_move(source_sq, target_sq, curr_piece, 0, 0, 0, 0, 0));
             } else {
-                add_move(move_list, encode_move(source_sq, target_sq, curr_piece, 0, 1, 0, 0, 0));
+                move_list.add(encode_move(source_sq, target_sq, curr_piece, 0, 1, 0, 0, 0));
             }
 
             popbit(attacks, target_sq);
@@ -483,7 +502,7 @@ __always_inline void generate_white_castling (Moves &move_list) {
         if(!getbit(occupancies[both], f1) && !getbit(occupancies[both], g1)) {
             // Make sure king's and F1 squares are not under attack
             if(!is_sq_attacked(black, e1) && !is_sq_attacked(black, f1) && !is_sq_attacked(black, g1)) {
-                add_move(move_list, encode_move(e1, g1, K, 0, 0, 0, 0, 1));
+                move_list.add(encode_move(e1, g1, K, 0, 0, 0, 0, 1));
             }
         }
     }
@@ -494,7 +513,7 @@ __always_inline void generate_white_castling (Moves &move_list) {
         if(!getbit(occupancies[both], d1) && !getbit(occupancies[both], c1) && !getbit(occupancies[both], b1)) {
             // Make sure king's and D1 squares are not under attack
             if(!is_sq_attacked(black, e1) && !is_sq_attacked(black, d1) && !is_sq_attacked(black, c1)) {
-                add_move(move_list, encode_move(e1, c1, K, 0, 0, 0, 0, 1));
+                move_list.add(encode_move(e1, c1, K, 0, 0, 0, 0, 1));
             }
         }
     }
@@ -507,7 +526,7 @@ __always_inline void generate_black_castling (Moves &move_list) {
         if(!getbit(occupancies[both], f8) && !getbit(occupancies[both], g8)) {
             // Make sure king's and F8 squares are not under attack
             if(!is_sq_attacked(white, e8) && !is_sq_attacked(white, f8) && !is_sq_attacked(white, g8)) {
-                add_move(move_list, encode_move(e8, g8, k, 0, 0, 0, 0, 1));
+                move_list.add(encode_move(e8, g8, k, 0, 0, 0, 0, 1));
             }
         }
     }
@@ -518,7 +537,7 @@ __always_inline void generate_black_castling (Moves &move_list) {
         if(!getbit(occupancies[both], d8) && !getbit(occupancies[both], c8) && !getbit(occupancies[both], b8)) {
             // Make sure king's and D8 squares are not under attack
             if(!is_sq_attacked(white, e8) && !is_sq_attacked(white, d8) && !is_sq_attacked(white, c8)) {
-                add_move(move_list, encode_move(e8, c8, k, 0, 0, 0, 0, 1));
+                move_list.add(encode_move(e8, c8, k, 0, 0, 0, 0, 1));
             }
         }
     }
@@ -566,10 +585,10 @@ __always_inline void generate_moves_king (Moves &move_list, state side) {
 
             if (!getbit(occupancies[!side], target_sq)) {
                 // Quiet move
-                add_move(move_list, encode_move(source_sq, target_sq, curr_piece, 0, 0, 0, 0, 0));
+                move_list.add(encode_move(source_sq, target_sq, curr_piece, 0, 0, 0, 0, 0));
             } else {
                 // Capture move
-                add_move(move_list, encode_move(source_sq, target_sq, curr_piece, 0, 1, 0, 0, 0));
+                move_list.add(encode_move(source_sq, target_sq, curr_piece, 0, 1, 0, 0, 0));
             }
 
             // Pop least significant bit from attacks bitboard
@@ -604,10 +623,10 @@ __always_inline void generate_moves_queen (Moves &move_list, state side) {
 
             if (!getbit(occupancies[!side], target_sq)) {
                 // Quiet move
-                add_move(move_list, encode_move(source_sq, target_sq, curr_piece, 0, 0, 0, 0, 0));
+                move_list.add(encode_move(source_sq, target_sq, curr_piece, 0, 0, 0, 0, 0));
             } else {
                 // Capture move
-                add_move(move_list, encode_move(source_sq, target_sq, curr_piece, 0, 1, 0, 0, 0));
+                move_list.add(encode_move(source_sq, target_sq, curr_piece, 0, 1, 0, 0, 0));
             }
 
             // Pop least significant bit from attacks bitboard

@@ -15,7 +15,7 @@ constexpr uint8_t update_castling_rights[64] = {
 
 // Generate all legal moves
 __always_inline void generate_moves (Moves &move_list) {
-    move_list.index = 0;
+    move_list.nextindex = 0;
 
     find_checkers(!stm);
 

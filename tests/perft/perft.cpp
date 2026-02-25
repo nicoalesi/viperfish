@@ -5,12 +5,12 @@ void perft_driver(uint8_t depth, uint64_t &nodes) {
     generate_moves(move_list);
 
     if (depth == 1) {
-        nodes += move_list.index;
+        nodes += move_list.size();
         return;
     }
 
-    for (uint8_t i = 0; i < move_list.index; i++) {
-        move mv = move_list.moves[i];
+    for (uint8_t i = 0; i < move_list.size(); i++) {
+        move mv = move_list[i];
 
         // Copy board state
         BoardState board;
@@ -32,13 +32,13 @@ uint64_t run_perft (uint8_t depth) {
     generate_moves(move_list);
 
     if (depth == 1) {
-        return move_list.index;
+        return move_list.size();
     }
 
     uint64_t leaves = 0ULL;
 
-    for (uint8_t i = 0; i < move_list.index; i++) {
-        move mv = move_list.moves[i];
+    for (uint8_t i = 0; i < move_list.size(); i++) {
+        move mv = move_list[i];
 
         BoardState board;
         copy_board_state(board);

@@ -14,12 +14,12 @@ inline void perft_driver(uint8_t depth, uint64_t &nodes) {
     generate_moves(move_list);
 
     if (depth == 1) {
-        nodes += move_list.index;
+        nodes += move_list.size();
         return;
     }
 
-    for (uint8_t i = 0; i < move_list.index; i++) {
-        move mv = move_list.moves[i];
+    for (uint8_t i = 0; i < move_list.size(); i++) {
+        move mv = move_list[i];
 
         // Copy board state
         BoardState board;

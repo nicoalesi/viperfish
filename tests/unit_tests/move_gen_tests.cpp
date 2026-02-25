@@ -1,13 +1,13 @@
 #include "move_gen_tests.hpp"
 
 bool compare_moves (std::vector<move> expected, Moves move_list) {
-    if (move_list.index != expected.size()) {
+    if (move_list.size() != expected.size()) {
         return false;
     }
 
-    std::sort(move_list.moves, move_list.moves + move_list.index);
-    for (uint8_t i = 0; i < move_list.index; i++) {
-        if (move_list.moves[i] != expected[i]) {
+    std::sort(move_list.begin(), move_list.end());
+    for (uint8_t i = 0; i < move_list.size(); i++) {
+        if (move_list[i] != expected[i]) {
             return false;
         }
     }

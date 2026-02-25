@@ -23,8 +23,8 @@ void run_user_perft (uint8_t depth) {
 
     uint64_t start_time = get_time_ms();
 
-    for (uint8_t i = 0; i < move_list.index; i++) {
-        move mv = move_list.moves[i];
+    for (uint8_t i = 0; i < move_list.size(); i++) {
+        move mv = move_list[i];
 
         // Copy board state
         BoardState board;
@@ -50,8 +50,8 @@ uint64_t run_perft (uint8_t depth) {
     uint64_t leaves = 0ULL;
 
     generate_moves(move_list);
-    for (uint8_t i = 0; i < move_list.index; i++) {
-        move mv = move_list.moves[i];
+    for (uint8_t i = 0; i < move_list.size(); i++) {
+        move mv = move_list[i];
 
         BoardState board;
         copy_board_state(board);
